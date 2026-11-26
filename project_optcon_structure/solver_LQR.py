@@ -75,7 +75,16 @@ def ltv_LQR(AA, BB, QQ, RR, SS, QQT, qq, rr, qqT, cc, x0):
     pptp = pp[:,tt+1] + PPtp @ ct
 
     # TODO 1: compute KK[:,:,tt], sigma[:,tt], PP[:,:,tt], pp[:,tt]: backward step of the augmented Riccati equation at time tt
-    raise NotImplementedError("TODO 1: compute KK[:,:,tt], sigma[:,tt], PP[:,:,tt], pp[:,tt]: backward step of the augmented Riccati equation at time tt")
+    ###raise NotImplementedError("TODO 1: compute KK[:,:,tt], sigma[:,tt], PP[:,:,tt], pp[:,tt]: backward step of the augmented Riccati equation at time tt")
+
+    KK[:,:,tt] = -np.linalg.inv(Rt + Bt.T@PPtp@Bt)@(St+Bt.T@PPtp@At)
+    sigma[:,tt] = -np.linalg.inv(Rt + Bt.T@PPtp@Bt)@(rt + Bt.T@pptp + Bt.T@PPtp@ct)
+  
+    pp[:,:,tt] = qt + At.T@pptp + At.T@PPtp@ct - KK[:,:,tt].T@(Rt + Bt.T@PPtp@Bt)@sigma[:,tt]
+    PP[:,:,tt] = Qt + At.T@PPtp@At - KK[:,:,tt].T@(Bt.T@PPtp@Bt)@KK[:,:,tt]
+
+    
+    
 
   # Forward simulation of the optimal closed-loop system
 

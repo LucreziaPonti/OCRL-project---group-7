@@ -41,17 +41,17 @@ plots.py               plots
 What you have to do
 -------------------
 1. Fill the holes:
-     TODO 1   solver_LQR.py     compute KK[:,:,tt], sigma[:,tt], PP[:,:,tt], pp[:,tt]: backward step of the augmented Riccati equation at time tt
-     TODO 2   algo_newton_optcon.py compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt
-     TODO 3   algo_newton_optcon.py compute KK, sigma, dx, du, descent_arm, JJ (descent_direction at the current trajectory) and descent_norm, the norm of (dx, du)
-     TODO 4   algo_newton_optcon.py compute uu_new[:,tt]: closed-loop update of the input, uu + stepsize*sigma + KK (xx_new - xx)
-     TODO 5   algo_newton_optcon.py compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)
-     TODO 6   main_task1.py     compute xx, uu, log: Newton's method (algo_newton_optcon.solve) from the initial guess (xx_init, uu_init)
-     TODO 7   algo_sqp_optcon.py compute cc (ns, TT): affine term of the linearized dynamics, from the defect hh
-     TODO 8   algo_sqp_optcon.py compute ss, M0, DM0: weight of the merit function, M1 = J + ss ||h||_1 at the iterate, and its directional derivative
-     TODO 9   algo_sqp_optcon.py compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)
-     TODO 10  algo_sqp_optcon.py compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)
-     TODO 11  main_task1.py     compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)
+X     TODO 1   solver_LQR.py     compute KK[:,:,tt], sigma[:,tt], PP[:,:,tt], pp[:,tt]: backward step of the augmented Riccati equation at time tt
+X     TODO 2   algo_newton_optcon.py compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt
+L     TODO 3   algo_newton_optcon.py compute KK, sigma, dx, du, descent_arm, JJ (descent_direction at the current trajectory) and descent_norm, the norm of (dx, du)
+L     TODO 4   algo_newton_optcon.py compute uu_new[:,tt]: closed-loop update of the input, uu + stepsize*sigma + KK (xx_new - xx)
+L     TODO 5   algo_newton_optcon.py compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)
+P     TODO 6   main_task1.py     compute xx, uu, log: Newton's method (algo_newton_optcon.solve) from the initial guess (xx_init, uu_init)
+P     TODO 7   algo_sqp_optcon.py compute cc (ns, TT): affine term of the linearized dynamics, from the defect hh
+P     TODO 8   algo_sqp_optcon.py compute ss, M0, DM0: weight of the merit function, M1 = J + ss ||h||_1 at the iterate, and its directional derivative
+S     TODO 9   algo_sqp_optcon.py compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)
+S     TODO 10  algo_sqp_optcon.py compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)
+S     TODO 11  main_task1.py     compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)
      TODO 12  plots.py          compute fig: figure of the states and inputs of (xx, uu) against (xx_ref, uu_ref), one subplot per signal
      TODO 13  plots.py          compute fig: figure of the desired curve and a few iterates of log['xx_iters'], log['uu_iters'], one subplot per signal
      TODO 14  plots.py          compute fig: figure of log['descent_norm'], log['cost'] (and log['constraint_norm'], if present) along the iterations, semilog

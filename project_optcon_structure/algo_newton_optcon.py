@@ -49,7 +49,24 @@ def linearize(dyn, xx, uu, xx_ref, uu_ref, QQt, RRt, QQT, bounds=None):
   for tt in range(TT-1):
 
     # TODO 2: compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt
-    raise NotImplementedError("TODO 2: compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt")
+    ####raise NotImplementedError("TODO 2: compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt")
+    
+    xxp,dfx,dfu = dyn.dynamics(xx[:,tt],uu[:,tt], jac=True)
+
+    ll, dlx, dlu, ddlx, ddlu, dlxu = cst.stagecost(xx[:,tt],uu[:,tt],xx_ref[:,tt],uu_ref[:,tt],QQt, RRt,bounds)
+
+    #L# stiamo guardando le formule a slide 13 del pacco 8 
+    #L# perche dall'intestazione del file dice di usare la regularized version con l'hessiana di SOLO la cost function
+    AA[:,:,tt] = dfx.T
+    BB[:,:,tt] = dfu.T
+    qq[:,tt] =  dlx
+    rr[:,tt] = dlu
+    QQ[:,:,tt] = ddlx
+    RR[:,:,tt] = ddlu
+    SS[:,:,tt] = dlxu
+    
+    JJ += ll
+
 
   lT, qqT, _ = cst.termcost(xx[:,-1], xx_ref[:,-1], QQT)
   JJ += lT
