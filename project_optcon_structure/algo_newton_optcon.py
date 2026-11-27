@@ -224,7 +224,7 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
       return cst.trajectory_cost(xx_temp, uu_temp, xx_ref, uu_ref, prm.QQt, prm.RRt, QQT, getattr(prm, 'input_bounds', None))
 
     # TODO 5: compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)
-    raise NotImplementedError("TODO 5: compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)")
+    #raise NotImplementedError("TODO 5: compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)")
     log['stepsize'].append(stepsize)
 
     # Step 3: update the trajectory (closed loop)
