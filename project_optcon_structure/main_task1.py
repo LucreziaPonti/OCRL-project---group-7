@@ -43,6 +43,7 @@ def optimal_transition(prm, xx_ref, uu_ref, task):
     # TODO 11: compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)
     #raise NotImplementedError("TODO 11: compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)")
     title = 'SQP'
+    xx, uu, log = algo_sqp_optcon.solve(dyn, xx_ref, uu_ref, xx_ref, uu_ref, prm)
   else:
     raise ValueError(f"solver must be 'newton' or 'sqp', not {prm.solver!r}")
 

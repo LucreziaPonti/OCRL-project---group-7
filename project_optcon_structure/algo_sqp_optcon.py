@@ -4,6 +4,8 @@
 # Merit function M1 = J + s*||h||_1 and Armijo stepsize selection on it
 #
 
+from asyncio import log
+
 import numpy as np
 
 import cost as cst
@@ -167,11 +169,14 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
       # TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)
       #raise NotImplementedError("TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)")
       
-      constraint_norm = np.linalg.norm(dynamics_defect(dyn, xx, uu))
 
       #S# dx, du, lmbd_qp, ss, M0, DM0, JJ --> presi direttamente dal "Return" dalla funzione descent_direction
-      dx, du, lmbd_qp, ss, M0, DM0, JJ = descent_direction(dyn, xx, uu, xx_ref, uu_ref, prm, QQT)
       
+      dx, du, lmbd_qp, ss, M0, DM0, JJ = descent_direction(dyn, xx, uu, xx_ref, uu_ref, prm, QQT)
+
+      descent_norm = np.sqrt(np.linalg.norm(dx)**2 + np.linalg.norm(du)**2) 
+
+      constraint_norm = np.linalg.norm(dynamics_defect(dyn, xx, uu))
 
     except np.linalg.LinAlgError:
       # the iterates diverged: the LQ problem cannot be solved
@@ -202,7 +207,10 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
     merit_fn = merit_function(dyn, xx, uu, dx, du, xx_ref, uu_ref, prm, QQT, ss)
 
     # TODO 10: compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)
-    raise NotImplementedError("TODO 10: compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)")
+    #raise NotImplementedError("TODO 10: compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)")
+
+    stepsize = armijo_merit.select_stepsize(merit_fn, M0, DM0, prm.armijo_stepsize0, prm.armijo_c, prm.armijo_beta, prm.armijo_max_iters, plot=False)    
+   
     log['stepsize'].append(stepsize)
 
     # Step 3: update (possibly violating the dynamics)
