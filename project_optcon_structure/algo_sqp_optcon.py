@@ -165,8 +165,13 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
 
 
       # TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)
-      raise NotImplementedError("TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)")
+      #raise NotImplementedError("TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)")
+      
       constraint_norm = np.linalg.norm(dynamics_defect(dyn, xx, uu))
+
+      #S# dx, du, lmbd_qp, ss, M0, DM0, JJ --> presi direttamente dal "Return" dalla funzione descent_direction
+      dx, du, lmbd_qp, ss, M0, DM0, JJ = descent_direction(dyn, xx, uu, xx_ref, uu_ref, prm, QQT)
+      
 
     except np.linalg.LinAlgError:
       # the iterates diverged: the LQ problem cannot be solved
