@@ -4,6 +4,8 @@
 # Merit function M1 = J + s*||h||_1 and Armijo stepsize selection on it
 #
 
+from asyncio import log
+
 import numpy as np
 
 import cost as cst
@@ -53,22 +55,39 @@ def descent_direction(dyn, xx, uu, xx_ref, uu_ref, prm, QQT):
   """
   ns, TT = xx.shape
 
-  hh = dynamics_defect(dyn, xx, uu)
+  #P# h_t(x, u) = f_t(x_t, u_t) - x_{t+1}, vedi pacco 8 - SQP for optimal control e pacco 3 - Dynamics as equality constraints
+  hh = dynamics_defect(dyn, xx, uu) 
 
 
   AA, BB, QQ, RR, SS, qq, rr, qqT, JJ = linearize(dyn, xx, uu, xx_ref, uu_ref, prm.QQt, prm.RRt, QQT,
                                                   bounds=getattr(prm, 'input_bounds', None))
 
   # TODO 7: compute cc (ns, TT): affine term of the linearized dynamics, from the defect hh
-  raise NotImplementedError("TODO 7: compute cc (ns, TT): affine term of the linearized dynamics, from the defect hh")
+  # raise NotImplementedError("TODO 7: compute cc (ns, TT): affine term of the linearized dynamics, from the defect hh")
+  #P# ct := ft(xt, ut) − xt+1, vedi pacco 8 - SQP for optimal control
   x0 = np.zeros((ns,))        # the initial state is fixed
+  cc = np.zeros((ns, TT))
+  cc[:, :-1] = hh #P# cc e hh sono di base la stessa cosa stando alla teoria, semplicemente cambia la dimensione 
+
 
   _, _, dx, du, lmbd_qp = ltv_LQR(AA, BB, QQ, RR, SS, QQT, qq, rr, qqT, cc, x0)
 
   # Merit function M1(z; s) = J(z) + s*||h(z)||_1
 
   # TODO 8: compute ss, M0, DM0: weight of the merit function, M1 = J + ss ||h||_1 at the iterate, and its directional derivative
-  raise NotImplementedError("TODO 8: compute ss, M0, DM0: weight of the merit function, M1 = J + ss ||h||_1 at the iterate, and its directional derivative")
+  # raise NotImplementedError("TODO 8: compute ss, M0, DM0: weight of the merit function, M1 = J + ss ||h||_1 at the iterate, and its directional derivative")
+  #P# si veda pacco 2 - Non linear Optimization, il nostro cost.py e il file SQP.py del lab 2
+  ss = 100*np.ceil(np.linalg.norm([lmbd_qp], np.inf))  #P# ss: penalty of the merit function
+  M0 = JJ + ss * np.linalg.norm([hh], 1)
+  # DM0 = dlk.T@deltaz - ss*np.linalg.norm([hh], 1)
+  # Si veda pacco 8 - SQP for optimal control 
+  grad_dot_d = ( # $$\sum_{t=0}^{T-1} \begin{bmatrix} q_t \\ r_t \end{bmatrix}^\top \begin{bmatrix} \Delta x_t \\ \Delta u_t \end{bmatrix} + q_T^\top \Delta x_T 
+      np.sum(qq[:, :-1] * dx[:, :-1]) # q_t^T*\Delta x_t
+      + np.sum(rr[:, :-1] * du[:, :-1]) # r_t^T*\Delta u_t
+      + np.dot(qqT.ravel(), dx[:, -1]) # q_T^T*\Delta x_T
+  )
+
+  DM0 = grad_dot_d - ss * np.linalg.norm([hh], 1)
 
   return dx, du, lmbd_qp, ss, M0, DM0, JJ
 
@@ -148,7 +167,15 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
 
 
       # TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)
-      raise NotImplementedError("TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)")
+      #raise NotImplementedError("TODO 9: compute dx, du, lmbd_qp, ss, M0, DM0, JJ (descent_direction at the current iterate) and descent_norm, the norm of (dx, du)")
+      
+
+      #S# dx, du, lmbd_qp, ss, M0, DM0, JJ --> presi direttamente dal "Return" dalla funzione descent_direction
+      
+      dx, du, lmbd_qp, ss, M0, DM0, JJ = descent_direction(dyn, xx, uu, xx_ref, uu_ref, prm, QQT)
+
+      descent_norm = np.sqrt(np.linalg.norm(dx)**2 + np.linalg.norm(du)**2) 
+
       constraint_norm = np.linalg.norm(dynamics_defect(dyn, xx, uu))
 
     except np.linalg.LinAlgError:
@@ -180,7 +207,10 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
     merit_fn = merit_function(dyn, xx, uu, dx, du, xx_ref, uu_ref, prm, QQT, ss)
 
     # TODO 10: compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)
-    raise NotImplementedError("TODO 10: compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)")
+    #raise NotImplementedError("TODO 10: compute stepsize: Armijo rule on the merit function (armijo_merit.select_stepsize with merit_fn, M0, DM0)")
+
+    stepsize = armijo_merit.select_stepsize(merit_fn, M0, DM0, prm.armijo_stepsize0, prm.armijo_c, prm.armijo_beta, prm.armijo_max_iters, plot=False)    
+   
     log['stepsize'].append(stepsize)
 
     # Step 3: update (possibly violating the dynamics)

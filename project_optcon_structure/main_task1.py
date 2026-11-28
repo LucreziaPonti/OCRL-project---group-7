@@ -36,12 +36,14 @@ def optimal_transition(prm, xx_ref, uu_ref, task):
     xx_init = np.repeat(xx_ref[:,[0]], TT, axis=1)
     uu_init = np.repeat(uu_ref[:,[0]], TT, axis=1)
     # TODO 6: compute xx, uu, log: Newton's method (algo_newton_optcon.solve) from the initial guess (xx_init, uu_init)
-    raise NotImplementedError("TODO 6: compute xx, uu, log: Newton's method (algo_newton_optcon.solve) from the initial guess (xx_init, uu_init)")
+    #raise NotImplementedError("TODO 6: compute xx, uu, log: Newton's method (algo_newton_optcon.solve) from the initial guess (xx_init, uu_init)")
     title = "Newton's method"
+    xx, uu, log = solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm) 
   elif prm.solver == 'sqp':
     # TODO 11: compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)
-    raise NotImplementedError("TODO 11: compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)")
+    #raise NotImplementedError("TODO 11: compute xx, uu, log: SQP (algo_sqp_optcon.solve) from the reference curve as initial guess (not a trajectory)")
     title = 'SQP'
+    xx, uu, log = algo_sqp_optcon.solve(dyn, xx_ref, uu_ref, xx_ref, uu_ref, prm)
   else:
     raise ValueError(f"solver must be 'newton' or 'sqp', not {prm.solver!r}")
 
