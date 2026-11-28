@@ -49,7 +49,7 @@ def linearize(dyn, xx, uu, xx_ref, uu_ref, QQt, RRt, QQT, bounds=None):
   for tt in range(TT-1):
 
     # TODO 2: compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt
-    ####raise NotImplementedError("TODO 2: compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt")
+    #L#raise NotImplementedError("TODO 2: compute AA[:,:,tt], BB[:,:,tt], QQ[:,:,tt], RR[:,:,tt], SS[:,:,tt], qq[:,tt], rr[:,tt] and add the stage cost to JJ: linearization of the dynamics and quadratic model of the cost at time tt")
     
     xxp,dfx,dfu = dyn.dynamics(xx[:,tt],uu[:,tt], jac=True)
 
@@ -131,7 +131,11 @@ def closed_loop_update(dyn, xx, uu, KK, sigma, stepsize):
 
   for tt in range(TT-1):
     # TODO 4: compute uu_new[:,tt]: closed-loop update of the input, uu + stepsize*sigma + KK (xx_new - xx)
-    raise NotImplementedError("TODO 4: compute uu_new[:,tt]: closed-loop update of the input, uu + stepsize*sigma + KK (xx_new - xx)")
+    #L#raise NotImplementedError("TODO 4: compute uu_new[:,tt]: closed-loop update of the input, uu + stepsize*sigma + KK (xx_new - xx)")
+
+    #L# anche qui, molto facile quasi sospetto..... ma ha senso.... - coerente con appunti pacco 8 ultima slide (18)
+
+    uu_new[:,tt] = uu[:,tt] + stepsize*sigma[:,tt] + KK[:,tt]@(xx_new[:,tt]-xx[:,tt])
     xx_new[:,tt+1] = dyn.dynamics(xx_new[:,tt], uu_new[:,tt], jac=False)[0]
 
   uu_new[:,-1] = uu_new[:,-2]     # not used, for plots only
@@ -193,7 +197,13 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
       if not (np.all(np.isfinite(xx)) and np.all(np.isfinite(uu))):
         raise np.linalg.LinAlgError('the trajectory is not finite')
       # TODO 3: compute KK, sigma, dx, du, descent_arm, JJ (descent_direction at the current trajectory) and descent_norm, the norm of (dx, du)
-      raise NotImplementedError("TODO 3: compute KK, sigma, dx, du, descent_arm, JJ (descent_direction at the current trajectory) and descent_norm, the norm of (dx, du)")
+      #L# raise NotImplementedError("TODO 3: compute KK, sigma, dx, du, descent_arm, JJ (descent_direction at the current trajectory) and descent_norm, the norm of (dx, du)")
+      
+      #L# non mi convince è davvero troppo facile.... basta prendere l'example dentro la descrizione della funzione descent_direction ?
+
+      KK, sigma, dx, du, descent_arm, JJ = descent_direction(dyn, xx, uu, xx_ref, uu_ref, prm, QQT)
+      descent_norm = np.sqrt(np.linalg.norm(dx)**2 + np.linalg.norm(du)**2)
+
     except np.linalg.LinAlgError:
       # the iterates diverged: the LQ problem cannot be solved
       descent_arm, JJ, descent_norm = np.nan, np.inf, np.nan
@@ -224,7 +234,13 @@ def solve(dyn, xx_ref, uu_ref, xx_init, uu_init, prm):
       return cst.trajectory_cost(xx_temp, uu_temp, xx_ref, uu_ref, prm.QQt, prm.RRt, QQT, getattr(prm, 'input_bounds', None))
 
     # TODO 5: compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)
-    raise NotImplementedError("TODO 5: compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)")
+    #L# raise NotImplementedError("TODO 5: compute stepsize: Armijo rule on the cost (armijo.select_stepsize with cost_fn, JJ, descent_arm)")
+
+    #L# ho ripreso da come usa la funzione in plots.py :)
+    #L# all the parameters that "characterize" the armijo rule are taken form the arg prm, which is set to "extract" them from the parameters.py file
+
+    stepsize = armijo.select_stepsize(cost_fn, JJ, descent_arm, prm.armijo_stepsize0, prm.armijo_c, prm.armijo_beta, prm.armijo_max_iters, plot=False)
+
     log['stepsize'].append(stepsize)
 
     # Step 3: update the trajectory (closed loop)
